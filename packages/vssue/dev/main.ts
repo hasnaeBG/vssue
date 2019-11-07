@@ -51,6 +51,6 @@ new Vue({
     }
   },
 
-  template: '<Vssue :issue-id="issueId" :options="options" />',
+  template: '<Vssue :issueId="issueId" :options="options" />',
   // template: '<Vssue :title="title" :options="options" />',
 })

@@ -1,5 +1,8 @@
 <template>
   <div class="vssue">
+    <!-- rating system -->
+    <RatingHeader />
+    <Rating />
     <!-- iconfont -->
     <Iconfont />
 
@@ -18,12 +21,16 @@ import Iconfont from './components/Iconfont.vue'
 import VssueBody from './components/VssueBody.vue'
 import VssueHeader from './components/VssueHeader.vue'
 import VssueStore from './VssueStore'
+import Rating from './components/Rating.vue'
+import RatingHeader from './components/RatingHeader.vue'
 
 @Component({
   components: {
     Iconfont,
     VssueBody,
     VssueHeader,
+    Rating,
+    RatingHeader,
   },
 })
 export default class Vssue extends Vue {
@@ -38,6 +45,12 @@ export default class Vssue extends Vue {
     required: false,
     default: null,
   }) issueId!: string | number | null
+
+  @Prop({
+    type: [String, Number],
+    required: false,
+    default: null,
+  }) issueIdR!: string | number | null
 
   @Prop({
     type: Object,
@@ -68,6 +81,10 @@ export default class Vssue extends Vue {
     }
     if (this.issueId !== null) {
       this.vssue.issueId = this.issueId
+    }
+
+    if (this.issueIdR !== null) {
+      this.vssue.issueIdR = this.issueIdR
     }
 
     // set options

@@ -28,6 +28,11 @@ const VssuePlugin: Vssue.Plugin = {
           required: false,
           default: undefined,
         },
+        issueIdR: {
+          type: [Number, String],
+          required: false,
+          default: undefined,
+        },
         options: {
           type: Object,
           required: false,
@@ -41,6 +46,7 @@ const VssuePlugin: Vssue.Plugin = {
           props: {
             title: props.title,
             issueId: props.issueId,
+            issueIdR: props.issueIdR,
             options: Object.assign({}, options, props.options),
           },
         })

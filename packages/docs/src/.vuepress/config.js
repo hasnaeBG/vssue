@@ -1,125 +1,70 @@
 module.exports = {
-  locales: {
-    '/': {
-      lang: 'en-US',
-      title: 'Vssue',
-      description: 'A Vue-powered Issue-based Comment Plugin',
-    },
-    '/zh/': {
-      lang: 'zh-CN',
-      title: 'Vssue',
-      description: 'Vue 驱动的、基于 Issue 的评论插件',
-    },
-  },
-
-  head: [
-    ['link', { rel: 'icon', href: `/favicon.ico` }],
-    // <link rel="manifest" href="/manifest.json">
-    ['link', { rel: 'manifest', href: `/manifest.json` }],
-    // <meta name="theme-color" content="#34c88a">
-    ['meta', { name: 'theme-color', content: '#34c88a' }],
-    // <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
-    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: `/assets/icons/favicon-32x32.png` }],
-    // <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
-    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: `/assets/icons/favicon-16x16.png` }],
-    // <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
-    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: `/assets/icons/apple-touch-icon.png` }],
-    // <meta name="application-name" content="Vssue">
-    ['meta', { name: 'application-name', content: 'Vssue' }],
-    // <meta name="apple-mobile-web-app-title" content="Vssue">
-    ['meta', { name: 'apple-mobile-web-app-title', content: 'Vssue' }],
-    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
-    ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
-    // <meta name="msapplication-TileColor" content="#34c88a">
-    ['meta', { name: 'msapplication-TileColor', content: '#34c88a' }],
-    ['meta', { name: 'msapplication-TileImage', content: '/assets/icons/mstile-150x150.png' }],
-    // <link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg" color="#34c88a">
-    ['link', { rel: 'mask-icon', href: '/assets/icons/safari-pinned-tab.svg', color: '#34c88a' }],
-  ],
-
-  markdown: {
-    extendMarkdown: md => md.use(require('markdown-it-center-text')),
-  },
 
   themeConfig: {
-    repo: 'meteorlxy/vssue',
-
     editLinks: true,
 
     docsDir: 'packages/docs/src',
 
-    locales: {
-      '/': {
-        label: 'English',
-        selectText: 'Languages',
-        editLinkText: 'Edit this page on GitHub',
-        lastUpdated: 'Last Updated',
-        nav: [
-          {
-            text: 'Demo',
-            link: '/demo/',
-          },
-          {
-            text: 'Guide',
-            link: '/guide/',
-          },
-          {
-            text: 'Options',
-            link: '/options/',
-          },
-          {
-            text: 'Changelog',
-            link: 'https://github.com/meteorlxy/vssue/blob/master/CHANGELOG.md',
-          },
-        ],
-        sidebar: {
-          '/demo/': sidebarDemo('Demo'),
-          '/guide/': sidebarGuide('Guide', 'Set up OAuth App'),
-        },
+    nav: [
+      {
+        text: 'Home',
+        link: '/',
       },
-      '/zh/': {
-        label: '简体中文',
-        selectText: '选择语言',
-        editLinkText: '在 GitHub 上编辑此页',
-        lastUpdated: '上次更新',
-        nav: [
-          {
-            text: '演示',
-            link: '/zh/demo/',
-          },
-          {
-            text: '指南',
-            link: '/zh/guide/',
-          },
-          {
-            text: '配置',
-            link: '/zh/options/',
-          },
-          {
-            text: '更新日志',
-            link: 'https://github.com/meteorlxy/vssue/blob/master/CHANGELOG.md',
-          },
-        ],
-        sidebar: {
-          '/zh/demo/': sidebarDemo('演示'),
-          '/zh/guide/': sidebarGuide('指南', '创建 OAuth App'),
-        },
+      {
+        text: 'BitBucket',
+        link: 'https://bitbucket.org',
       },
+      {
+        text: 'Contribute',
+        link: '/Contribution/',
+      },
+    ],
+    sidebar: [
+      '/',
+      '/Git/',
+      {
+        'title': 'Javascript',
+        'children': [
+          '/JavaScript/ES5/',
+          '/JavaScript/ES6/',
+        ],
+      },
+      {
+        'title': 'SFB2C',
+        'children': [
+          '/SFB2C/commerce-api/',
+          '/SFB2C/site-genesis/',
+          '/SFB2C/SFRA/',
+          '/SFB2C/ocapi/',
+        ],
+      },
+      {
+        'title': 'Style',
+        'children': [
+          '/Style/BEM/',
+          '/Style/Legacy/',
+          '/Style/SASS/',
+        ],
+      },
+      '/Regexp/',
+      '/Contribution/',
+    ],
+
+  },
+
+  plugins: {
+    '@vssue/vuepress-plugin-vssue': {
+      // set `platform` rather than `api`
+      platform: 'bitbucket',
+      // all other options of Vssue are allowed
+      owner: 'itelios',
+      repo: 'sye-documentation',
+      clientId: '3Qq29aMwJHKNxJChCk',
+      prefix: '',
     },
   },
 
-  plugins: [
-    '@vuepress/plugin-back-to-top',
-    ['@vuepress/plugin-pwa', {
-      serviceWorker: true,
-      updatePopup: true,
-    }],
-    ['@vuepress/google-analytics', {
-      'ga': 'UA-132770851-3',
-    }],
-    '@vssue/vuepress-plugin-vssue',
-    'vuepress-plugin-medium-zoom',
-  ],
+  title: 'Itelios Code',
 
   chainWebpack: (config, isServer) => {
     if (isServer === false) {

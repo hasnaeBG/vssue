@@ -1,0 +1,21 @@
+image: node:10.15.1
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - npmci
+        name: Build and Deploy
+        script:
+          - npm ci
+          - npm run build
+          - pipe: atlassian/aws-s3-deploy:0.2.1
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: "eu-west-3"
+              S3_BUCKET: "itelios-bitbucket-pipelines"
+              LOCAL_PATH: $BITBUCKET_CLONE_DIR/.vuepress/dist
+definitions:
+  caches:
+    npmci: node_modules/

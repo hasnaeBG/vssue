@@ -17,6 +17,12 @@ const messages: VueI18n.LocaleMessageObject = {
   delete: 'Delete',
   reply: 'Reply',
 
+  // vote input
+  deleting: 'Deleting',
+  deleteVote: 'Yes, delete my vote',
+  updating: 'Updating',
+  updateVote: 'Update Vote',
+
   // reactions
   heart: 'Heart',
   like: 'Like',

@@ -376,4 +376,49 @@ export default class BitbucketV2 implements VssueAPI.Instance {
   async postCommentReaction (options): Promise<boolean> {
     throw new Error('501 Not Implemented')
   }
+
+  /**
+   * Get Ratings of this page according to the issue id
+   *
+   * @param options.accessToken - User access token
+   * @param options.issueId - The id of issue
+   * @param options.query - The query parameters
+   *
+   * @return The comments
+   *
+   * @see https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/issues/%7Bissue_id%7D/comments#get
+   * @see https://developer.atlassian.com/bitbucket/api/2/reference/meta/pagination
+   */
+
+  async getRatings ({
+    accessToken,
+    issueId,
+    query: {
+      sort = 'desc',
+    } = {},
+  }: {
+    accessToken: VssueAPI.AccessToken
+    issueId: string | number
+    query?: Partial<VssueAPI.Query>
+  }): Promise<VssueAPI.Comments> {
+    const options: AxiosRequestConfig = {
+      params: {
+        'sort': sort === 'desc' ? '-created_on' : 'created_on',
+        // to avoid caching
+        timestamp: Date.now(),
+      },
+    }
+    if (accessToken) {
+      options.headers = {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    }
+    const { data } = await this.$http.get(`repositories/${this.owner}/${this.repo}/issues/${issueId}/comments`, options)
+    return {
+      count: data.size,
+      page: data.page,
+      perPage: data.pagelen,
+      data: data.values.filter(item => item.content.raw !== null).map(normalizeComment),
+    }
+  }
 }

@@ -11,6 +11,8 @@ class VssueStore extends Vue implements Vssue.Store {
 
   title: string | ((options: Vssue.Options) => string) = options => `${options.prefix}${document.title}`
 
+  titleR: string | ((options: Vssue.Options) => string) = options => `${options.prefix}[Meta]${document.title}`
+
   get issueTitle (): string {
     if (this.options === null) {
       return ''
@@ -18,7 +20,16 @@ class VssueStore extends Vue implements Vssue.Store {
     return typeof this.title === 'function' ? this.title(this.options) : `${this.options.prefix}${this.title}`
   }
 
+  get issueTitleR (): string {
+    if (this.options === null) {
+      return ''
+    }
+    return typeof this.titleR === 'function' ? this.titleR(this.options) : `${this.options.prefix}[Meta]${this.title}`
+  }
+
   issueId: number | string | null = null
+
+  issueIdR: number | string | null = null
 
   options: Vssue.Options | null = null
 
@@ -30,7 +41,15 @@ class VssueStore extends Vue implements Vssue.Store {
 
   issue: VssueAPI.Issue | null = null
 
+  issueR: VssueAPI.Issue | null = null
+
   comments: VssueAPI.Comments | null = null
+
+  totalRating: number = 0
+
+  ratings: VssueAPI.Comments | null = null
+
+  userRating: VssueAPI.Comment | null = null
 
   query: VssueAPI.Query = {
     page: 1,
@@ -53,6 +72,12 @@ class VssueStore extends Vue implements Vssue.Store {
   isCreatingComment: boolean = false
 
   isUpdatingComment: boolean = false
+
+  isRating: boolean = false
+
+  isDeletingVote: boolean = false
+
+  isUpdatingVote: boolean = false
 
   get isPending (): boolean {
     return this.isLoadingComments || this.isCreatingComment || this.isUpdatingComment
@@ -137,6 +162,13 @@ class VssueStore extends Vue implements Vssue.Store {
 
       // init comments
       await this.initComments()
+
+      // init rating
+      await this.initRatings()
+
+      await this.getTotalRating()
+
+      await this.getUserRating()
     } catch (e) {
       if (e.response && [401, 403].includes(e.response.status)) {
         // in some cases, require login to load comments
@@ -154,13 +186,14 @@ class VssueStore extends Vue implements Vssue.Store {
   async initStore (): Promise<void> {
     try {
       if (!this.options) throw new Error('Options are required to initialize Vssue')
-
       // reset data
       this.API = null
       this.accessToken = null
       this.user = null
       this.issue = null
       this.comments = null
+      this.ratings = null
+      this.totalRating = 0
       this.query = {
         page: 1,
         perPage: this.options.perPage,
@@ -176,7 +209,9 @@ class VssueStore extends Vue implements Vssue.Store {
       this.isLoadingComments = false
       this.isCreatingComment = false
       this.isUpdatingComment = false
-
+      this.isRating = false
+      this.isDeletingVote = false
+      this.isUpdatingVote = false
       // get the VssueAPI instance according to the options.api
       const APIConstructor = this.options.api
 
@@ -239,6 +274,75 @@ class VssueStore extends Vue implements Vssue.Store {
         // try to load comments
         await this.getComments()
       }
+    }
+  }
+
+  /**
+   * Init Rating
+   */
+  async initRatings (): Promise<void> {
+    if (!this.API || !this.options) return
+
+    if (this.issueIdR) {
+      // if issueId is set, get the issue and comments in the mean time
+      // notice that vssue will not try to create the issue is not found
+      const [issueR, ratings] = await Promise.all([
+        this.API.getIssue({
+          accessToken: this.accessToken,
+          issueId: this.issueIdR,
+        }),
+        this.API.getRatings({
+          accessToken: this.accessToken,
+          issueId: this.issueIdR,
+          query: this.query,
+        }),
+      ])
+      this.issueR = issueR
+      this.ratings = ratings
+    } else {
+      // get issue according to title
+      this.issueR = await this.API.getIssue({
+        accessToken: this.accessToken,
+        issueTitle: this.issueTitleR,
+      })
+
+      if (this.issueR === null) {
+        // if the issue of this page does not exist
+        this.isIssueNotCreated = true
+
+        // try to create issue when `autoCreateIssue = true`
+        if (this.options.autoCreateIssue) {
+          await this.postIssue()
+        }
+      } else {
+        // try to load comments
+        await this.getRatings()
+      }
+    }
+  }
+
+  getRatingFromContent (comment : VssueAPI.Comment): number {
+    return JSON.parse(comment.content.slice(3, comment.content.length - 4)).rating
+  }
+
+  async getTotalRating () : Promise <void> {
+    if (this.ratings) {
+      let m = 0
+      this.ratings.data.forEach(element => {
+        m += this.getRatingFromContent(element)
+      })
+      this.totalRating = m / this.ratings.count
+    }
+  }
+
+  async getUserRating () : Promise <void> {
+    if (this.ratings) {
+      const Rating = this.ratings.data.filter(rating => {
+        if (this.user) { return rating.author.username === this.user.username }
+      })
+
+      if (Rating.length === 1) this.userRating = Rating[0]
+      else this.userRating = null
     }
   }
 
@@ -346,6 +450,93 @@ class VssueStore extends Vue implements Vssue.Store {
   }
 
   /**
+   * Post a new vote
+   */
+  async postRating ({
+    content,
+  }: {
+    content: string
+  }): Promise<VssueAPI.Comment | void> {
+    try {
+      if (!this.API || !this.issueR || this.isRating) return
+
+      this.isRating = true
+
+      const comment = await this.API.postComment({
+        accessToken: this.accessToken,
+        content,
+        issueId: this.issueR.id,
+      })
+
+      return comment
+    } catch (e) {
+      this.$emit('error', e)
+      throw e
+    } finally {
+      this.isRating = false
+    }
+  }
+
+  /**
+   * Post a new vote
+   */
+  async deleteRating ({
+    commentId,
+  }: {
+    commentId: number | string
+  }): Promise<boolean | void> {
+    try {
+      if (!this.API || !this.issueR) return
+
+      this.isDeletingVote = true
+
+      const success = await this.API.deleteComment({
+        accessToken: this.accessToken,
+        issueId: this.issueR.id,
+        commentId,
+      })
+
+      return success
+    } catch (e) {
+      this.$emit('error', e)
+      throw e
+    } finally {
+      this.isDeletingVote = false
+    }
+  }
+
+  /**
+   * Edit rating
+   */
+  async putRating ({
+    commentId,
+    content,
+  }: {
+    commentId: number | string
+    content: string
+  }): Promise<VssueAPI.Comment | void> {
+    try {
+      if (!this.API || !this.issueR) return
+
+      this.isUpdatingVote = true
+
+      const comment = await this.API.putComment({
+        accessToken: this.accessToken,
+        issueId: this.issueR.id,
+        commentId,
+        content,
+      })
+
+      return comment
+    } catch (e) {
+      this.$emit('error', e)
+      throw e
+    } finally {
+      this.isUpdatingVote = false
+    }
+  }
+
+  /**
    * Edit a comment
    */
   async putComment ({
@@ -444,6 +635,44 @@ class VssueStore extends Vue implements Vssue.Store {
     } catch (e) {
       this.$emit('error', e)
       throw e
+    }
+  }
+
+  /**
+   * Get Ratings of this vssue according to the issue id
+   */
+  async getRatings (): Promise<VssueAPI.Comments | void> {
+    try {
+      if (!this.API || !this.issueR || this.isLoadingComments) return
+
+      this.isLoadingComments = true
+
+      const ratings = await this.API.getRatings({
+        accessToken: this.accessToken,
+        issueId: this.issueR.id,
+        query: this.query,
+      })
+
+      this.ratings = ratings
+
+      if (this.query.page !== ratings.page) {
+        this.query.page = ratings.page
+      }
+
+      if (this.query.perPage !== ratings.perPage) {
+        this.query.perPage = ratings.perPage
+      }
+
+      return ratings
+    } catch (e) {
+      if (e.response && [401, 403].includes(e.response.status) && !this.isLogined) {
+        this.isLoginRequired = true
+      } else {
+        this.$emit('error', e)
+        throw e
+      }
+    } finally {
+      this.isLoadingComments = false
     }
   }
 

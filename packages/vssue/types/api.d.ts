@@ -52,6 +52,12 @@ export namespace VssueAPI {
     data: Array<VssueAPI.Comment>
   }
 
+  export type Ratings = {
+    count: number
+    page: number
+    perPage: number
+    data: Array<VssueAPI.Comment>
+  }
   export type Reactions = {
     like?: number
     unlike?: number
@@ -219,6 +225,22 @@ export namespace VssueAPI {
       commentId: string | number
       reaction: keyof VssueAPI.Reactions
     }): Promise<boolean>
+
+    /**
+     * Get comments of issue according to the issue id
+     *
+     * @param options.accessToken - User access token
+     * @param options.issueId - The id of issue
+     * @param options.query - The query parameters
+     *
+     * @return The comments
+     */
+    getRatings (options: {
+      accessToken: VssueAPI.AccessToken
+      issueId: string | number
+      query?: Partial<VssueAPI.Query>
+    }): Promise<VssueAPI.Comments>
+
   }
 
   export interface Constructor {

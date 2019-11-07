@@ -1,7 +1,7 @@
 {
-  "private": true,
   "name": "vssue",
   "version": "1.0.3",
+  "private": true,
   "workspaces": [
     "packages/@vssue/*",
     "packages/vssue",
@@ -33,6 +33,10 @@
       "sort-package-json",
       "git add"
     ]
+  },
+  "dependencies": {
+    "@innologica/vue-stackable-modal": "^0.1.9",
+    "vue-star-rating": "^1.6.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",

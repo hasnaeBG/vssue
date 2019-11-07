@@ -1,0 +1,12 @@
+---
+title: Contribution
+sidebarDepth: 1
+---
+
+## Process
+
+## Guidelines
+
+## Plugins used
+
+## Step by step contribution example

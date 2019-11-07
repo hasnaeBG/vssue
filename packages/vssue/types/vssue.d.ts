@@ -33,13 +33,16 @@ export namespace Vssue {
     version: string
     title: string | ((options: Vssue.Options) => string)
     issueTitle: string
-    issueId: number | string | null
+    issueId: number | string | null,
+    issueIdR: number | string | null
     options: Vssue.Options | null
     API: VssueAPI.Instance | null
     accessToken: string | null
     user: VssueAPI.User | null
     issue: VssueAPI.Issue | null
+    issueR: VssueAPI.Issue | null
     comments: VssueAPI.Comments | null
+    userRating: VssueAPI.Comment | null
     query: VssueAPI.Query
     isInitializing: boolean
     isIssueNotCreated: boolean
@@ -52,6 +55,9 @@ export namespace Vssue {
     isLogined: boolean
     isAdmin: boolean
     isPending: boolean
+    isRating: boolean
+    isDeletingVote: boolean
+    isUpdatingVote : boolean
     setOptions (options: Partial<Vssue.Options>): void
     init (): Promise<void>
     postIssue (): Promise<VssueAPI.Issue | void>
@@ -61,6 +67,12 @@ export namespace Vssue {
     putComment (options: { commentId: number | string, content: string }): Promise<VssueAPI.Comment | void>
     getCommentReactions (options: { commentId: number | string }): Promise<VssueAPI.Reactions | void>
     postCommentReaction (options: { commentId: number | string, reaction: keyof VssueAPI.Reactions }): Promise<boolean | void>
+    postRating (options: { content: string }): Promise<VssueAPI.Comment | void>
+    getRatings (): Promise<VssueAPI.Comments | void>
+    getTotalRating () : Promise <void>
+    getUserRating () : Promise <void>
+    putRating (options: { commentId: number | string, content: string }): Promise<VssueAPI.Comment | void>
+    deleteRating (options: { commentId: number | string }): Promise<boolean | void>
     login (): void
     logout (): void
   }

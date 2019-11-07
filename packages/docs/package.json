@@ -1,20 +1,18 @@
 {
   "name": "docs",
-  "version": "1.1.2",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "build": "vuepress build src -d dist",
     "dev": "vuepress dev src"
   },
   "dependencies": {
-    "@vssue/api-github-v3": "^1.1.2",
-    "@vssue/vuepress-plugin-vssue": "^1.1.1",
-    "@vuepress/plugin-back-to-top": "^1.0.0",
-    "@vuepress/plugin-google-analytics": "1.0.0",
-    "@vuepress/plugin-pwa": "^1.0.0",
-    "markdown-it-center-text": "^1.0.4",
-    "vue-server-renderer": "^2.6.10",
-    "vuepress": "^1.1.0",
-    "vuepress-plugin-medium-zoom": "^1.1.3"
+    "@innologica/vue-stackable-modal": "^0.1.9",
+    "@vssue/api-bitbucket-v2": "file:../@vssue/api-bitbucket-v2",
+    "@vssue/utils": "file:../@vssue/utils",
+    "@vssue/vuepress-plugin-vssue": "file:../@vssue/vuepress-plugin-vssue",
+    "vssue": "file:../vssue",
+    "vue-star-rating": "^1.6.1",
+    "vuepress": "^1.2.0"
   }
 }
