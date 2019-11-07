@@ -57,9 +57,9 @@ module.exports = {
       // set `platform` rather than `api`
       platform: 'bitbucket',
       // all other options of Vssue are allowed
-      owner: 'itelios',
-      repo: 'sye-documentation',
-      clientId: '3Qq29aMwJHKNxJChCk',
+      owner: '<owner>',
+      repo: '<repo_name>',
+      clientId: '<clientId>',
       prefix: '',
     },
   },
