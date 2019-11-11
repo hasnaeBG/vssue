@@ -17,14 +17,14 @@ class VssueStore extends Vue implements Vssue.Store {
     if (this.options === null) {
       return ''
     }
-    return typeof this.title === 'function' ? this.title(this.options) : `${this.options.prefix}${this.title}`
+    return typeof this.title === 'function' ? this.title(this.options) : `${this.title}[Comment]`
   }
 
   get issueTitleR (): string {
     if (this.options === null) {
       return ''
     }
-    return typeof this.titleR === 'function' ? this.titleR(this.options) : `${this.options.prefix}[Meta]${this.title}`
+    return `${this.title}[Rating]`
   }
 
   issueId: number | string | null = null
@@ -126,7 +126,7 @@ class VssueStore extends Vue implements Vssue.Store {
       perPage: 10,
       proxy: (url: string): string => `https://cors-anywhere.herokuapp.com/${url}`,
       issueContent: ({ url }): string => url,
-      autoCreateIssue: false,
+      autoCreateIssue: true,
     }, options)
 
     // check options
@@ -263,11 +263,13 @@ class VssueStore extends Vue implements Vssue.Store {
       })
 
       if (this.issue === null) {
+        console.log('hellooooo')
         // if the issue of this page does not exist
         this.isIssueNotCreated = true
 
         // try to create issue when `autoCreateIssue = true`
         if (this.options.autoCreateIssue) {
+          console.log('lets create the issue')
           await this.postIssue()
         }
       } else {
@@ -358,7 +360,7 @@ class VssueStore extends Vue implements Vssue.Store {
     }
 
     // only owner/admins can create issue
-    if (!this.isAdmin) return
+    // if (!this.isAdmin) return
 
     try {
       this.isCreatingIssue = true
@@ -372,10 +374,23 @@ class VssueStore extends Vue implements Vssue.Store {
         accessToken: this.accessToken,
       })
 
+      const issueR = await this.API.postIssue({
+        title: this.issueTitleR,
+        content: await this.options.issueContent({
+          options: this.options,
+          url: getCleanURL(window.location.href),
+        }),
+        accessToken: this.accessToken,
+      })
+
       this.issue = issue
+      this.issueR = issueR
       this.isIssueNotCreated = false
 
       await this.getComments()
+      await this.getRatings()
+      await this.getTotalRating()
+      await this.getUserRating()
     } catch (e) {
       this.isFailed = true
     } finally {

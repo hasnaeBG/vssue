@@ -7,3 +7,5 @@ title: Legacy
 ## Triks & Traps 
 
 ## Snippets
+
+<Vssue title="Legacy" />

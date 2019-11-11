@@ -1274,13 +1274,13 @@ let VssueStore = class VssueStore extends Vue$1 {
         if (this.options === null) {
             return '';
         }
-        return typeof this.title === 'function' ? this.title(this.options) : `${this.options.prefix}${this.title}`;
+        return typeof this.title === 'function' ? this.title(this.options) : `${this.title}[Comment]`;
     }
     get issueTitleR() {
         if (this.options === null) {
             return '';
         }
-        return typeof this.titleR === 'function' ? this.titleR(this.options) : `${this.options.prefix}[Meta]${this.title}`;
+        return `${this.title}[Rating]`;
     }
     get isPending() {
         return this.isLoadingComments || this.isCreatingComment || this.isUpdatingComment;
@@ -1318,7 +1318,7 @@ let VssueStore = class VssueStore extends Vue$1 {
             perPage: 10,
             proxy: (url) => `https://cors-anywhere.herokuapp.com/${url}`,
             issueContent: ({ url }) => url,
-            autoCreateIssue: false,
+            autoCreateIssue: true,
         }, options);
         // check options
         const requiredOptions = [
@@ -1448,10 +1448,12 @@ let VssueStore = class VssueStore extends Vue$1 {
                 issueTitle: this.issueTitle,
             });
             if (this.issue === null) {
+                console.log('hellooooo');
                 // if the issue of this page does not exist
                 this.isIssueNotCreated = true;
                 // try to create issue when `autoCreateIssue = true`
                 if (this.options.autoCreateIssue) {
+                    console.log('lets create the issue');
                     await this.postIssue();
                 }
             }
@@ -1540,8 +1542,7 @@ let VssueStore = class VssueStore extends Vue$1 {
             this.login();
         }
         // only owner/admins can create issue
-        if (!this.isAdmin)
-            return;
+        // if (!this.isAdmin) return
         try {
             this.isCreatingIssue = true;
             const issue = await this.API.postIssue({
@@ -1552,9 +1553,21 @@ let VssueStore = class VssueStore extends Vue$1 {
                 }),
                 accessToken: this.accessToken,
             });
+            const issueR = await this.API.postIssue({
+                title: this.issueTitleR,
+                content: await this.options.issueContent({
+                    options: this.options,
+                    url: getCleanURL(window.location.href),
+                }),
+                accessToken: this.accessToken,
+            });
             this.issue = issue;
+            this.issueR = issueR;
             this.isIssueNotCreated = false;
             await this.getComments();
+            await this.getRatings();
+            await this.getTotalRating();
+            await this.getUserRating();
         }
         catch (e) {
             this.isFailed = true;
@@ -2052,7 +2065,7 @@ var __vue_staticRenderFns__$9 = [];
   /* style */
   const __vue_inject_styles__$c = function (inject) {
     if (!inject) return
-    inject("data-v-25ece46a_0", { source: "@import url(https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css);.modalButton{margin:5px}", map: undefined, media: undefined });
+    inject("data-v-f3c60ed8_0", { source: "@import url(https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css);.modalButton{margin:5px}", map: undefined, media: undefined });
 
   };
   /* scoped */

@@ -10,3 +10,5 @@ sidebarDepth: 1
 ## Plugins used
 
 ## Step by step contribution example
+
+<Vssue title="Contribution" />

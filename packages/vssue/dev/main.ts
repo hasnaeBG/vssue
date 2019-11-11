@@ -4,7 +4,7 @@ import VssuePlugin, {
   VssueComponent,
 } from 'vssue'
 // @ts-ignore
-import PlatformAPI from '@vssue/api'
+import PlatformAPI from '@vssue/api-bitbucket-v2'
 
 import 'vssue/dist/vssue.css'
 import 'github-markdown-css'
@@ -24,7 +24,7 @@ const options: Partial<Vssue.Options> = {
   perPage: 5,
   proxy: url => `https://cors-anywhere.herokuapp.com/${url}`,
   issueContent: ({ url }) => url,
-  autoCreateIssue: false,
+  autoCreateIssue: true,
 }
 
 if (!onlyComponent) {
@@ -40,7 +40,7 @@ new Vue({
   data () {
     return {
       title: 'Vssue Dev',
-      issueId: 1,
+      // issueId: 2,
       options: onlyComponent ? options : {
         // override the default options here if use plugin
         perPage: 7,
@@ -51,6 +51,6 @@ new Vue({
     }
   },
 
-  template: '<Vssue :issueId="issueId" :options="options" />',
-  // template: '<Vssue :title="title" :options="options" />',
+  // template: '<Vssue :title:"title" :issueId="issueId" :options="options" />',
+  template: '<Vssue :title="title" :options="options" />',
 })

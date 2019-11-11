@@ -7,3 +7,5 @@ title: Javascript ES6
 ## Triks & Traps 
 
 ## Snippets
+
+<Vssue title="ES6" />

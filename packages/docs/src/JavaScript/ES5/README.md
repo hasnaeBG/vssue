@@ -8,6 +8,6 @@ title: Javascript ES5
 
 ## Snippets
 
-
+<Vssue title="ES5" />
 
 <!-- <Content :page-key="getPageKey($site.pages, '/included.html')" /> -->

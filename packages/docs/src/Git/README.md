@@ -12,6 +12,4 @@ title: Git
 
 # Vssue Demo
 
-<Vssue title="Vssue Demo" />
-
-
+<Vssue title="Git" />
